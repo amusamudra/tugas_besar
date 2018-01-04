@@ -1,0 +1,51 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class respawn : MonoBehaviour {
+	public static int levelN = 0;
+	private Vector3 startPos;
+	private Quaternion startRot;
+	// Use this for initialization
+	void Start () {
+		startPos = transform.position;
+		startRot = transform.rotation;
+		
+	}
+	void nextLevel()
+	{
+		levelN++;
+
+		if (levelN > 3) 
+		{
+			levelN = 0;
+		}
+		Application.LoadLevel(levelN);
+	}
+	
+	// Update is called once per frame
+	void OnTriggerEnter(Collider col)
+	{
+		if (col.tag == "death") 
+		{
+			transform.position = startPos;
+			transform.rotation = startRot;
+			GetComponent<Animator> ().Play ("LOSE00", -1, 0f);
+			GetComponent<Rigidbody> ().velocity = new Vector3 (0f, 0f, 0f);
+			GetComponent<Rigidbody> ().angularVelocity = new Vector3 (0f, 0f, 0f);
+		}
+		else if(col.tag=="Finish")
+		{
+			GetComponent<Animator> ().Play ("WIN00", -1, 0f);
+			Destroy(col.gameObject);
+			Invoke ("nextLevel", 2f);
+		}
+		else if(col.tag=="checkpoint")
+		{
+			GetComponent<Animator> ().Play ("WIN00", -1, 0f);
+			startPos = col.transform.position;
+			startRot = col.transform.rotation;
+			Destroy(col.gameObject);
+		}
+	}
+}
